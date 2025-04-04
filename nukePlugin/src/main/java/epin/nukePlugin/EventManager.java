@@ -87,6 +87,7 @@ public class EventManager implements Listener {
             if (ev.getRightClicked().getPersistentDataContainer().has(nukePlugin.instance.isNuke, PersistentDataType.BOOLEAN) && ev.getRightClicked().getPersistentDataContainer().get(nukePlugin.instance.isNuke, PersistentDataType.BOOLEAN)) {
                 ev.getRightClicked().getLocation().getBlock().setType(Material.TNT);
                 blockMap.put(ev.getRightClicked().getLocation(), nukePlugin.instance.nuke);
+                ev.getPlayer().getServer().broadcastMessage(ChatColor.GREEN + ev.getPlayer().getName().toUpperCase() + ChatColor.WHITE + " defused the bomb. Crisis Averted");
                 ev.getRightClicked().remove();
             }
         }
