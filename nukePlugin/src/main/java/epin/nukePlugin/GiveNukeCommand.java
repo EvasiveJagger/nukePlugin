@@ -18,6 +18,9 @@ public class GiveNukeCommand implements CommandExecutor {
             } else {
                 p.sendMessage("Incorrect formatting!");
             }
+            /*for (ItemStack i : nukePlugin.instance.items) {
+                p.getInventory().addItem(i.asQuantity(64));
+            }*/
             return true;
         }
         return false;
