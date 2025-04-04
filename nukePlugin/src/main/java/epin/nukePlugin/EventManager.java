@@ -53,7 +53,7 @@ public class EventManager implements Listener {
     public void onDropCore(PlayerDropItemEvent ev) {
         if (ev.getItemDrop().getItemStack().asOne().equals(nukePlugin.instance.unstableCore)) {
             ev.getItemDrop().remove();
-            ev.getItemDrop().getWorld().createExplosion(ev.getPlayer().getLocation(), Math.min(ev.getItemDrop().getItemStack().getAmount() * 12, 96), false);
+            ev.getItemDrop().getWorld().createExplosion(ev.getPlayer().getLocation(), 12F, false);
         }
     }
 
