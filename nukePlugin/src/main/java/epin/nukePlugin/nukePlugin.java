@@ -9,8 +9,11 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.*;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.checkerframework.checker.units.qual.A;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 public final class nukePlugin extends JavaPlugin {
 
@@ -19,6 +22,8 @@ public final class nukePlugin extends JavaPlugin {
     public ArrayList<ItemStack> items;
 
     public ArrayList<NamespacedKey> keys;
+
+    public Map<Player, Player> bannedPlayers; //key is banned player, value is player that killed them
 
     public ItemStack nuke;
 
@@ -36,6 +41,10 @@ public final class nukePlugin extends JavaPlugin {
 
     public NamespacedKey coreKey;
 
+    public ItemStack banHammer;
+
+    public NamespacedKey banHammerKey;
+
     public NamespacedKey isNuke;
 
     @Override
@@ -47,6 +56,8 @@ public final class nukePlugin extends JavaPlugin {
 
         items = new ArrayList<>();
         keys = new ArrayList<>();
+        bannedPlayers = new HashMap<>() {
+        };
 
         nuke = new ItemStack(Material.TNT);
         isNuke = new NamespacedKey(this, "isNuke");
@@ -90,6 +101,21 @@ public final class nukePlugin extends JavaPlugin {
         stableMeta.lore(genLore);
         stableCore.setItemMeta(stableMeta);
         items.add(stableCore);
+
+        banHammerKey = new NamespacedKey(this, "ban_hammer");
+        keys.add(banHammerKey);
+        banHammer = new ItemStack(Material.MACE);
+        ItemMeta banMeta = banHammer.getItemMeta();
+        banMeta.customName(Component.text(ChatColor.LIGHT_PURPLE + "Ban Hammer"));
+        ArrayList<Component> banLore = new ArrayList<>();
+        banLore.add(genLore.get(0));
+        banLore.add(Component.text("A one-durability weapon that, if used to kill a player,"));
+        banLore.add(Component.text(ChatColor.BOLD + "'bans' them until the next server restart."));
+        banLore.add(Component.text("NOTE: This weapon does not permaban, only for a little bit."));
+        banMeta.lore(banLore);
+        banHammer.setItemMeta(banMeta);
+        banHammer.setDurability((short) 499); //THIS IS BUGGED IT GETS FULL DURABILITY
+        items.add(banHammer);
 
         Bukkit.getLogger().info("sigma energy");
         // Plugin startup logic
@@ -138,6 +164,19 @@ public final class nukePlugin extends JavaPlugin {
         nukeRecipe.setIngredient('T', stableCore);
         getServer().addRecipe(nukeRecipe, true);
 
+        //the bigger boy (banhammer)
+        ShapedRecipe banRecipe = new ShapedRecipe(banHammerKey, banHammer);
+        banRecipe.shape("BNB",
+                        "SCS",
+                        "sbs");
+        banRecipe.setIngredient('B', Material.NETHERITE_BLOCK);
+        banRecipe.setIngredient('N', nuke.asQuantity(8));
+        banRecipe.setIngredient('S', Material.NETHER_STAR);
+        banRecipe.setIngredient('C', Material.HEAVY_CORE);
+        banRecipe.setIngredient('b', new ItemStack(Material.BREEZE_ROD).asQuantity(32));
+        banRecipe.setIngredient('s', new ItemStack(Material.RESIN_BRICK).asQuantity(64));
+        getServer().addRecipe(banRecipe, true);
+
         for(Player p : getServer().getOnlinePlayers()) {
             unlockRecipes(p);
         }
@@ -145,7 +184,7 @@ public final class nukePlugin extends JavaPlugin {
 
     @Override
     public void onDisable() {
-        // Plugin shutdown logic
+        bannedPlayers = new HashMap<>();
     }
 
     public void unlockRecipes(Player p) {

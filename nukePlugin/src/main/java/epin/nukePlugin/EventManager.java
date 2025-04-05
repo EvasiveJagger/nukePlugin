@@ -1,5 +1,6 @@
 package epin.nukePlugin;
 
+import net.kyori.adventure.text.Component;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -12,6 +13,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.block.TNTPrimeEvent;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.inventory.FurnaceSmeltEvent;
 import org.bukkit.event.inventory.FurnaceStartSmeltEvent;
@@ -20,6 +22,7 @@ import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataType;
+import org.bukkit.scheduler.BukkitTask;
 
 import java.util.*;
 
@@ -114,10 +117,26 @@ public class EventManager implements Listener {
     }
 
     @EventHandler
+    public void onBanHammerSlam(EntityDamageByEntityEvent ev) {
+        if (ev.getDamager() instanceof Player atk && ev.getEntity() instanceof Player vic) {
+            //atk = attacker, vic = victim
+            if (atk.getInventory().getItemInMainHand().asOne().equals(nukePlugin.instance.banHammer)) {
+                nukePlugin.instance.bannedPlayers.put(vic, atk);
+                vic.kick(Component.text("You were banned at the hand of " + atk.getName()));
+                BukkitTask unbanTask = new UnbanTask(vic).runTaskLater(nukePlugin.instance, 432000); //6 hours = 432000
+                atk.getInventory().getItemInMainHand().damage(1500, atk);
+            }
+        }
+    }
+
+    @EventHandler
     public void onPlayerJoin(PlayerJoinEvent ev) {
         for(NamespacedKey key : nukePlugin.instance.keys) {
             if (ev.getPlayer().hasDiscoveredRecipe(key)) {
                 ev.getPlayer().discoverRecipe(key);
+            }
+            if (nukePlugin.instance.bannedPlayers.containsKey(ev.getPlayer())) {
+                ev.getPlayer().kick(Component.text("You were banned at the hand of " + nukePlugin.instance.bannedPlayers.get(ev.getPlayer()).getName()));
             }
         }
     }
