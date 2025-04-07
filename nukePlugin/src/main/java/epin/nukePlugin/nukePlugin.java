@@ -132,7 +132,7 @@ public final class nukePlugin extends JavaPlugin {
         ArrayList<Component> unstableLore = new ArrayList<>();
         unstableLore.add(genLore.get(0));
         unstableLore.add(Component.text("Blasting (blast furnace) this is a good idea."));
-        unstableLore.add(Component.text("Dropping it, however, is not a good idea."));
+        unstableLore.add(Component.text("Drop it like the demon core"));
         unstableMeta.lore(unstableLore);
         unstableCore.setItemMeta(unstableMeta);
         items.add(unstableCore);
@@ -141,7 +141,7 @@ public final class nukePlugin extends JavaPlugin {
         keys.add(coreKey);
         stableCore = new ItemStack(Material.WAXED_OXIDIZED_COPPER_BULB);
         ItemMeta stableMeta = stableCore.getItemMeta();
-        stableMeta.customName(Component.text(ChatColor.AQUA + "Stable Nuclear Core"));
+        stableMeta.customName(Component.text(ChatColor.AQUA + "Stabilized Nuclear Core"));
         stableMeta.lore(genLore);
         stableCore.setItemMeta(stableMeta);
         items.add(stableCore);
@@ -153,7 +153,7 @@ public final class nukePlugin extends JavaPlugin {
         banMeta.customName(Component.text(ChatColor.LIGHT_PURPLE + "Ban Hammer"));
         ArrayList<Component> banLore = new ArrayList<>();
         banLore.add(genLore.get(0));
-        banLore.add(Component.text("A one-durability weapon that, if used to kill a player,"));
+        banLore.add(Component.text("Albert if u have this fuck you."));
         banLore.add(Component.text(ChatColor.BOLD + "'bans' them until the next server restart."));
         banLore.add(Component.text("NOTE: This weapon does not permaban, only for a little bit."));
         banMeta.lore(banLore);

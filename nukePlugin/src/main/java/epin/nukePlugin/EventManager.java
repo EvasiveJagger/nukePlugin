@@ -6,6 +6,8 @@ import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
+import org.bukkit.damage.DamageSource;
+import org.bukkit.damage.DamageType;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.TNTPrimed;
@@ -60,7 +62,7 @@ public class EventManager implements Listener {
     public void onDropCore(PlayerDropItemEvent ev) {
         if (ev.getItemDrop().getItemStack().asOne().equals(nukePlugin.instance.unstableCore)) {
             ev.getItemDrop().remove();
-            ev.getItemDrop().getWorld().createExplosion(ev.getPlayer().getLocation(), 12F, false);
+            ev.getItemDrop().getWorld().createExplosion(ev.getPlayer().getLocation(), 12F, true);
         }
     }
 
@@ -68,7 +70,7 @@ public class EventManager implements Listener {
     public void onLightNuke(TNTPrimeEvent ev) { //3 mins
         if (blockMap.get(ev.getBlock().getLocation()).equals(nukePlugin.instance.neoNuke)) {
             if (!(ev.getCause().equals(TNTPrimeEvent.PrimeCause.PLAYER))) return;
-            if (ev.getPrimingEntity() instanceof Player) ev.getPrimingEntity().getServer().broadcastMessage(ChatColor.RED + ev.getPrimingEntity().getName().toUpperCase() + ChatColor.WHITE + " HAS LIT A " + ChatColor.RED + "NUKE!");
+            if (ev.getPrimingEntity() instanceof Player) ev.getPrimingEntity().getServer().broadcastMessage(ChatColor.RED + "A NUKE"+ ChatColor.WHITE + " HAS BEEN LIT" );
             //cancel the event and set the block to air
             ev.setCancelled(true);
             ev.getBlock().setType(Material.AIR);
@@ -77,7 +79,7 @@ public class EventManager implements Listener {
             tnt.setFuseTicks(3600); //check this
             BukkitTask nukeCountdown = new NukeCountdownTask(nukePlugin.instance.getServer().getCurrentTick()).runTaskTimer(nukePlugin.instance, 0, 1);
             tnt.setGlowing(true);
-            List<Entity> list = tnt.getNearbyEntities(25, 25, 25);
+            List<Entity> list = tnt.getNearbyEntities(75, 75, 75);
             for (Entity k : list) {
                 if (k instanceof Player p) {
                     if (!(ev.getCause().equals(TNTPrimeEvent.PrimeCause.EXPLOSION))) p.sendMessage(ChatColor.RED + "YOU ARE WITHIN BLAST RADIUS. " + ChatColor.BOLD + "RUN.");
@@ -114,7 +116,7 @@ public class EventManager implements Listener {
                     }
                 }
                 for(Player p : ev.getLocation().getWorld().getPlayers()) {
-                    if (p.getName().equals("maxthedod")) p.damage(20000);
+                    if (p.getName().equals("maxthedod")) p.sendMessage(Component.text("Fuck you specifically"));
                 }
             }
         }
