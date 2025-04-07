@@ -21,6 +21,7 @@ import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataType;
+import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 
 import java.util.*;
@@ -64,7 +65,7 @@ public class EventManager implements Listener {
     }
 
     @EventHandler
-    public void onLightNuke(TNTPrimeEvent ev) {
+    public void onLightNuke(TNTPrimeEvent ev) { //3 mins
         if (blockMap.get(ev.getBlock().getLocation()).equals(nukePlugin.instance.neoNuke)) {
             if (!(ev.getCause().equals(TNTPrimeEvent.PrimeCause.PLAYER))) return;
             if (ev.getPrimingEntity() instanceof Player) ev.getPrimingEntity().getServer().broadcastMessage(ChatColor.RED + ev.getPrimingEntity().getName().toUpperCase() + ChatColor.WHITE + " HAS LIT A " + ChatColor.RED + "NUKE!");
@@ -73,7 +74,8 @@ public class EventManager implements Listener {
             ev.getBlock().setType(Material.AIR);
             //spawn a primed tnt at the same spot at 8 seconds to detonation
             TNTPrimed tnt = ev.getBlock().getWorld().spawn(ev.getBlock().getLocation().add(.5, .5, .5), TNTPrimed.class);
-            tnt.setFuseTicks(400); //check this
+            tnt.setFuseTicks(3600); //check this
+            BukkitTask nukeCountdown = new NukeCountdownTask(nukePlugin.instance.getServer().getCurrentTick()).runTask(nukePlugin.instance);
             tnt.setGlowing(true);
             List<Entity> list = tnt.getNearbyEntities(25, 25, 25);
             for (Entity k : list) {
