@@ -27,11 +27,21 @@ public final class nukePlugin extends JavaPlugin {
 
     public ItemStack nuke;
 
+    public ItemStack neoNuke;
+
     public NamespacedKey nukeKey;
 
     public ItemStack gpdrBlock;
 
     public NamespacedKey gpdrBlkKey;
+
+    public ItemStack superGpdrBlock;
+
+    public NamespacedKey superGpdrKey;
+
+    public ItemStack hyperGpdrBlock;
+
+    public NamespacedKey hyperGpdrKey;
 
     public ItemStack unstableCore;
 
@@ -60,25 +70,59 @@ public final class nukePlugin extends JavaPlugin {
         };
 
         nuke = new ItemStack(Material.TNT);
+        ItemMeta oldNukeMeta = nuke.getItemMeta();
+        oldNukeMeta.customName(Component.text("Sterilized Nuke"));
+        ArrayList<Component> oldNukeLore = new ArrayList<>();
+        oldNukeLore.add(Component.text("A deprecated part of the Nuke Plugin."));
+        oldNukeLore.add(Component.text("All the explosive power radiated away."));
+        oldNukeLore.add(Component.text("Literally just a normal TNT now. Toss this away."));
+        oldNukeMeta.lore(oldNukeLore);
+        nuke.setItemMeta(oldNukeMeta);
+        items.add(nuke);
+
+        neoNuke = new ItemStack(Material.TNT);
         isNuke = new NamespacedKey(this, "isNuke");
         nukeKey = new NamespacedKey(this, "nuke");
         keys.add(nukeKey);
-        ItemMeta nukeMeta = nuke.getItemMeta();
+        ItemMeta nukeMeta = neoNuke.getItemMeta();
         nukeMeta.customName(Component.text(ChatColor.LIGHT_PURPLE + "Nuke"));
-        nukeMeta.lore(genLore);
-        nuke.setItemMeta(nukeMeta);
+        ArrayList<Component> nukeLore = new ArrayList<>();
+        nukeLore.add(Component.text("The culmination of your work."));
+        nukeLore.add(Component.text("Goes through water, through walls,"));
+        nukeLore.add(Component.text("and any hope the enemy has left."));
+        nukeLore.add(genLore.get(0));
+        nukeMeta.lore(nukeLore);
+        neoNuke.setItemMeta(nukeMeta);
         getServer().getPluginManager().registerEvents(new EventManager(), this);
         getCommand("gimme").setExecutor(new GiveNukeCommand());
-        items.add(nuke);
+        items.add(neoNuke);
 
         gpdrBlkKey = new NamespacedKey(this, "gunpowder_block");
         keys.add(gpdrBlkKey);
-        gpdrBlock = new ItemStack(Material.GRAY_CONCRETE_POWDER);
+        gpdrBlock = new ItemStack(Material.LIGHT_GRAY_CONCRETE_POWDER);
         ItemMeta gpdrMeta = gpdrBlock.getItemMeta();
         gpdrMeta.customName(Component.text("Block of Gunpowder"));
         gpdrMeta.lore(genLore);
         gpdrBlock.setItemMeta(gpdrMeta);
         items.add(gpdrBlock);
+
+        superGpdrKey = new NamespacedKey(this, "compressed_gunpowder_block");
+        keys.add(superGpdrKey);
+        superGpdrBlock = new ItemStack(Material.GRAY_CONCRETE_POWDER);
+        ItemMeta sgpdrMeta = superGpdrBlock.getItemMeta();
+        sgpdrMeta.customName(Component.text("Compressed Block of Gunpowder"));
+        sgpdrMeta.lore(genLore);
+        superGpdrBlock.setItemMeta(sgpdrMeta);
+        items.add(superGpdrBlock);
+
+        hyperGpdrKey = new NamespacedKey(this, "super_compressed_gunpowder_block");
+        keys.add(hyperGpdrKey);
+        hyperGpdrBlock = new ItemStack(Material.BLACK_CONCRETE_POWDER);
+        ItemMeta hgpdrMeta = hyperGpdrBlock.getItemMeta();
+        hgpdrMeta.customName(Component.text("Ultra-Compressed Block of Gunpowder"));
+        hgpdrMeta.lore(genLore);
+        hyperGpdrBlock.setItemMeta(hgpdrMeta);
+        items.add(hyperGpdrBlock);
 
         unCoreKey = new NamespacedKey(this, "unstable_core");
         keys.add(unCoreKey);
@@ -138,29 +182,61 @@ public final class nukePlugin extends JavaPlugin {
         blockToGpwd.addIngredient(gpdrBlock);
         getServer().addRecipe(blockToGpwd, true);
 
+        //compressed gunpowder block
+        ShapedRecipe superGpwdBlockRecipe = new ShapedRecipe(superGpdrKey, superGpdrBlock);
+        superGpwdBlockRecipe.shape("GGG",
+                              "GGG",
+                              "GGG");
+        superGpwdBlockRecipe.setIngredient('G', gpdrBlock);
+        getServer().addRecipe(superGpwdBlockRecipe, true);
+
+        //gunpowder block from compressed gunpowder block
+        NamespacedKey gpwdBlock = new NamespacedKey(this, "super_to_gunpowder_block");
+        keys.add(gpwdBlock);
+        ShapelessRecipe superToBlock = new ShapelessRecipe(gpwdBlock, gpdrBlock.asQuantity(9));
+        superToBlock.addIngredient(superGpdrBlock);
+        getServer().addRecipe(superToBlock, true);
+
+        //ultra-compressed gunpowder block
+        ShapedRecipe hyperGpwdBlockRecipe = new ShapedRecipe(hyperGpdrKey, hyperGpdrBlock);
+        hyperGpwdBlockRecipe.shape("GGG",
+                                   "GGG",
+                                   "GGG");
+        hyperGpwdBlockRecipe.setIngredient('G', superGpdrBlock);
+        getServer().addRecipe(hyperGpwdBlockRecipe, true);
+
+        //ultra-compressed gunpowder block into compressed gunpowder blocks
+        NamespacedKey superGpwdBlock = new NamespacedKey(this, "hyper_to_super_gunpowder_block");
+        keys.add(superGpwdBlock);
+        ShapelessRecipe hyperToSuper = new ShapelessRecipe(superGpwdBlock, superGpdrBlock.asQuantity(9));
+        hyperToSuper.addIngredient(hyperGpdrBlock);
+        getServer().addRecipe(hyperToSuper, true);
+
         //unstable core
         ShapedRecipe unstableCoreRecipe = new ShapedRecipe(unCoreKey, unstableCore);
-        unstableCoreRecipe.shape("NGS",
+        unstableCoreRecipe.shape("NCS",
                                  "GTG",
-                                 "SGN");
-        unstableCoreRecipe.setIngredient('N', Material.NETHERITE_INGOT);
+                                 "SEN");
+        unstableCoreRecipe.setIngredient('N', Material.NETHERITE_BLOCK);
         unstableCoreRecipe.setIngredient('G', Material.GLOWSTONE);
         unstableCoreRecipe.setIngredient('T', Material.TNT);
-        unstableCoreRecipe.setIngredient('S', Material.WITHER_SKELETON_SKULL);
+        unstableCoreRecipe.setIngredient('S', Material.NETHER_STAR);
+        unstableCoreRecipe.setIngredient('C', Material.HEAVY_CORE);
+        unstableCoreRecipe.setIngredient('E', Material.ECHO_SHARD);
         getServer().addRecipe(unstableCoreRecipe, true);
 
         //stable core
-        BlastingRecipe stableCoreRecipe = new BlastingRecipe(coreKey, stableCore, new RecipeChoice.ExactChoice(unstableCore), 2, 7200);
+        BlastingRecipe stableCoreRecipe = new BlastingRecipe(coreKey, stableCore, new RecipeChoice.ExactChoice(unstableCore), 2, 9999);
         getServer().addRecipe(stableCoreRecipe, true);
         //a furnace full of blaze rods will be able to smelt 2 total
         //check onSmeltBypass if this doesn't work
 
         //the big boy
-        ShapedRecipe nukeRecipe = new ShapedRecipe(nukeKey, nuke);
+        ShapedRecipe nukeRecipe = new ShapedRecipe(nukeKey, neoNuke);
         nukeRecipe.shape("GGG",
                          "GTG",
                          "GGG");
-        nukeRecipe.setIngredient('G', gpdrBlock);
+        nukeRecipe.setIngredient('G', hyperGpdrBlock);
         nukeRecipe.setIngredient('T', stableCore);
         getServer().addRecipe(nukeRecipe, true);
 
@@ -175,7 +251,7 @@ public final class nukePlugin extends JavaPlugin {
         banRecipe.setIngredient('C', Material.HEAVY_CORE);
         banRecipe.setIngredient('b', new ItemStack(Material.BREEZE_ROD).asQuantity(32));
         banRecipe.setIngredient('s', new ItemStack(Material.RESIN_BRICK).asQuantity(64));
-        getServer().addRecipe(banRecipe, true);
+        //getServer().addRecipe(banRecipe, true);
 
         for(Player p : getServer().getOnlinePlayers()) {
             unlockRecipes(p);

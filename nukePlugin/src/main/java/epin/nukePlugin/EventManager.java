@@ -1,5 +1,6 @@
 package epin.nukePlugin;
 
+import com.destroystokyo.paper.event.player.PlayerJumpEvent;
 import net.kyori.adventure.text.Component;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -15,8 +16,6 @@ import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.block.TNTPrimeEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
-import org.bukkit.event.inventory.FurnaceSmeltEvent;
-import org.bukkit.event.inventory.FurnaceStartSmeltEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
@@ -34,6 +33,10 @@ public class EventManager implements Listener {
 
     @EventHandler
     public void onPlaceCustom(BlockPlaceEvent ev) {
+        if (ev.getItemInHand().hasItemMeta() && ev.getItemInHand().getItemMeta().hasLore() && ev.getItemInHand().getItemMeta().hasCustomName() && ev.getItemInHand().getItemMeta().customName().equals(Component.text(ChatColor.LIGHT_PURPLE + "Nuke")) && ev.getItemInHand().getItemMeta().lore().get(0).equals(Component.text("Part of the Nuke plugin by Ep1n"))) {
+            ev.getPlayer().getInventory().setItemInMainHand(new ItemStack(nukePlugin.instance.nuke.asQuantity(ev.getItemInHand().getAmount())));
+            ev.setCancelled(true);
+        }
         if (nukePlugin.instance.items.contains(ev.getItemInHand().asOne())) {
             blockMap.put(ev.getBlockPlaced().getLocation(), nukePlugin.instance.items.get(nukePlugin.instance.items.indexOf(ev.getItemInHand().asOne())));
         }
@@ -62,7 +65,8 @@ public class EventManager implements Listener {
 
     @EventHandler
     public void onLightNuke(TNTPrimeEvent ev) {
-        if (blockMap.containsKey(ev.getBlock().getLocation())) {
+        if (blockMap.get(ev.getBlock().getLocation()).equals(nukePlugin.instance.neoNuke)) {
+            if (!(ev.getCause().equals(TNTPrimeEvent.PrimeCause.PLAYER))) return;
             if (ev.getPrimingEntity() instanceof Player) ev.getPrimingEntity().getServer().broadcastMessage(ChatColor.RED + ev.getPrimingEntity().getName().toUpperCase() + ChatColor.WHITE + " HAS LIT A " + ChatColor.RED + "NUKE!");
             //cancel the event and set the block to air
             ev.setCancelled(true);
@@ -73,12 +77,10 @@ public class EventManager implements Listener {
             tnt.setGlowing(true);
             List<Entity> list = tnt.getNearbyEntities(25, 25, 25);
             for (Entity k : list) {
-                if (k instanceof Player) {
-                    Player p = (Player) k;
+                if (k instanceof Player p) {
                     if (!(ev.getCause().equals(TNTPrimeEvent.PrimeCause.EXPLOSION))) p.sendMessage(ChatColor.RED + "YOU ARE WITHIN BLAST RADIUS. " + ChatColor.BOLD + "RUN.");
                 }
             }
-            if (ev.getCause().equals(TNTPrimeEvent.PrimeCause.EXPLOSION)) tnt.setFuseTicks(0);
             //check in another method when it explodes and make the explosion size bigger
             tnt.getPersistentDataContainer().set(nukePlugin.instance.isNuke, PersistentDataType.BOOLEAN, true);
         }
@@ -89,7 +91,7 @@ public class EventManager implements Listener {
         if (ev.getPlayer().getInventory().getItemInMainHand().getType().equals(Material.FLINT_AND_STEEL)) {
             if (ev.getRightClicked().getPersistentDataContainer().has(nukePlugin.instance.isNuke, PersistentDataType.BOOLEAN) && ev.getRightClicked().getPersistentDataContainer().get(nukePlugin.instance.isNuke, PersistentDataType.BOOLEAN)) {
                 ev.getRightClicked().getLocation().getBlock().setType(Material.TNT);
-                blockMap.put(ev.getRightClicked().getLocation(), nukePlugin.instance.nuke);
+                blockMap.put(ev.getRightClicked().getLocation(), nukePlugin.instance.neoNuke);
                 ev.getPlayer().getServer().broadcastMessage(ChatColor.GREEN + ev.getPlayer().getName().toUpperCase() + ChatColor.WHITE + " defused the bomb. Crisis Averted");
                 ev.getRightClicked().remove();
             }
@@ -131,7 +133,7 @@ public class EventManager implements Listener {
 
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent ev) {
-        for(NamespacedKey key : nukePlugin.instance.keys) {
+        for (NamespacedKey key : nukePlugin.instance.keys) {
             if (ev.getPlayer().hasDiscoveredRecipe(key)) {
                 ev.getPlayer().discoverRecipe(key);
             }
