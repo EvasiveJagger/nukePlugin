@@ -16,27 +16,27 @@ public class NukeCountdownTask extends BukkitRunnable {
         int tickDiff = nukePlugin.instance.getServer().getCurrentTick() - startTick;
         if (tickDiff == 1200) {
             //one minute
-            nukePlugin.instance.getServer().sendMessage(Component.text("NUKE EXPLOSION IN T-2:00"));
+            nukePlugin.instance.getServer().sendMessage(Component.text(ChatColor.RED + "NUKE EXPLOSION IN T-2:00"));
         }
         if (tickDiff == 2400) {
             //one minute
-            nukePlugin.instance.getServer().sendMessage(Component.text("NUKE EXPLOSION IN T-1:00"));
+            nukePlugin.instance.getServer().sendMessage(Component.text(ChatColor.RED + "" + ChatColor.BOLD + "NUKE EXPLOSION IN T-1:00"));
         }
         if (tickDiff == 3000) {
             //one minute
-            nukePlugin.instance.getServer().sendMessage(Component.text("NUKE EXPLOSION IN T-0:30"));
+            nukePlugin.instance.getServer().sendMessage(Component.text(ChatColor.RED + "" + ChatColor.BOLD + "NUKE EXPLOSION IN T-0:30"));
         }
         if (tickDiff == (3600 - 60)) {
             //one minute
-            nukePlugin.instance.getServer().sendMessage(Component.text("3"));
+            nukePlugin.instance.getServer().sendMessage(Component.text(ChatColor.RED + "" + ChatColor.BOLD + "" + ChatColor.UNDERLINE + "3"));
         }
         if (tickDiff == (3600 - 40)) {
             //one minute
-            nukePlugin.instance.getServer().sendMessage(Component.text("2"));
+            nukePlugin.instance.getServer().sendMessage(Component.text(ChatColor.RED + "" + ChatColor.BOLD + "" + ChatColor.UNDERLINE + "2"));
         }
         if (tickDiff == (3600 - 20)) {
             //one minute
-            nukePlugin.instance.getServer().sendMessage(Component.text("1"));
+            nukePlugin.instance.getServer().sendMessage(Component.text(ChatColor.RED + "" + ChatColor.BOLD + "" + ChatColor.UNDERLINE + "1"));
         }
         if (tickDiff == 3600) {
             this.cancel();

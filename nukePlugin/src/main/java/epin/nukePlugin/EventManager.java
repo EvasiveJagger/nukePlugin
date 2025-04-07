@@ -75,7 +75,7 @@ public class EventManager implements Listener {
             //spawn a primed tnt at the same spot at 8 seconds to detonation
             TNTPrimed tnt = ev.getBlock().getWorld().spawn(ev.getBlock().getLocation().add(.5, .5, .5), TNTPrimed.class);
             tnt.setFuseTicks(3600); //check this
-            BukkitTask nukeCountdown = new NukeCountdownTask(nukePlugin.instance.getServer().getCurrentTick()).runTask(nukePlugin.instance);
+            BukkitTask nukeCountdown = new NukeCountdownTask(nukePlugin.instance.getServer().getCurrentTick()).runTaskTimer(nukePlugin.instance, 0, 1);
             tnt.setGlowing(true);
             List<Entity> list = tnt.getNearbyEntities(25, 25, 25);
             for (Entity k : list) {
